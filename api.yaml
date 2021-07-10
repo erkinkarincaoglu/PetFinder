@@ -117,6 +117,59 @@ paths:
                 $ref: '#/components/schemas/Error'    
     
   /entry/{entryId}:
+    get:
+      tags:
+        - Entries
+      summary: Retrieve a missing pet entry
+      operationId: getMissingPetEntry
+      parameters:
+        - name: X-PF-CorrelationId
+          in: header
+          description: >-
+            This header contains the ID by which we should be able to map entire journey of request
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: entryId
+          in: path
+          description: >-
+            EntryId
+          required: true
+          schema:
+            type: string            
+      responses:
+        '200':
+          description: A missing pet entry
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MissingPetEntry'
+        '400':
+          description: 'Missing parameters, Invalid value for parameters'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'                
+        '401':
+          description: 'Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: 'Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'      
     put:
       tags:
         - Entries
