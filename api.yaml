@@ -9,10 +9,10 @@ tags:
     description: APIs to manage pet missing entries
   - name: Comments
     description: API to create and retrive the comment on an entry
-  - name: PetFound
+  - name: Claims
     description: Send "Pet Found" messages to the owners with a photo proof  
 paths:
-  /entry:
+  /entries:
     get:
       tags:
         - Entries
@@ -116,7 +116,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'    
     
-  /entry/{entryId}:
+  /entries/{entryId}:
     get:
       tags:
         - Entries
@@ -226,7 +226,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'                
-  /entry/{entryId}/comment:
+  /entries/{entryId}/comments:
     get:
       tags:
         - Comments
@@ -329,10 +329,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'    
 
-  /entry/{entryId}/petfound:
+  /entries/{entryId}/claims:
     post:
       tags:
-        - PetFound
+        - Claims
       summary: Post a new "Pet Found" message to the owner with a photo proof
       operationId: createPetFound
       parameters:
