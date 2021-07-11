@@ -353,7 +353,7 @@ paths:
             type: string               
       requestBody:
         content:
-          multipart/form-data:
+          application/json:
             schema:
               $ref: '#/components/schemas/PetFound'
         required: true            
@@ -404,20 +404,15 @@ components:
           items:
             $ref: '#/components/schemas/Comment'            
     PetFound:
-      description: A comment in an entry
+      description: Pet found message sent to the ownner
       type: object
       required:
         - message
-        - photo
       properties:
         message:
           description: Message to the owner. e.g. "Hi ! I found your cat. It is with me and safe."
           type: string
           example: "Hi ! I found your cat. It is with me and safe."
-        photo:
-          description: Photo. Binary file.
-          type: string
-          format: binary
 
     Comment:
       description: A comment in an entry
