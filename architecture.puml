@@ -1,0 +1,99 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+' uncomment the following line and comment the first to use locally
+' !include C4_Container.puml
+
+
+
+LAYOUT_LEFT_RIGHT()
+LAYOUT_WITH_LEGEND()
+
+!define AWSPuml https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v10.0/dist
+!includeurl AWSPuml/AWSCommon.puml
+!includeurl AWSPuml/MachineLearning/SageMakerModel.puml
+!includeurl AWSPuml/Robotics/RoboMaker.puml
+
+!includeurl AWSPuml/AWSC4Integration.puml
+!includeurl AWSPuml/Storage/SimpleStorageService.puml
+!includeurl AWSPuml/Database/DynamoDB.puml
+!includeurl AWSPuml/Compute/Lambda.puml
+!includeurl AWSPuml/NetworkingContentDelivery/CloudFront.puml
+!includeurl AWSPuml/ApplicationIntegration/APIGateway.puml
+!includeurl AWSPuml/SecurityIdentityCompliance/Cognito.puml
+!includeurl AWSPuml/ApplicationIntegration/SimpleQueueService.puml
+!includeurl AWSPuml/ApplicationIntegration/SimpleNotificationService.puml
+
+
+Person(owner, "Pet Owner")
+Person(spotter, "Spotter")
+
+
+UpdateElementStyle(Container, $bgColor="white")
+UpdateElementStyle(Container, $fontColor="black")
+
+
+
+
+System_Boundary(c1, "Pet Finder Service"){
+    
+    Container(web_app, "Single Page App", "Javascript Angular or Flutter", "Allows pet owners to record missing pets.\n Allows spotters to report pet findings, comment on entries and claim rewards")
+
+    Container(cognito, "AWS Cognito", "Cognito User Pools", "Stores user identities and credentials. Allows integration with external identity providers such as  Amazon,Google,Facebook etc..",$sprite="Cognito,color=D6242D")
+
+    Container(api, "AWS API Gateway", "Restful API End Point", "Provides Pet Finder Service APIs",$sprite="APIGateway,color=CC2264")
+
+    Container(sqs, "SQS", "SQS", "Buffer request between API Gateway and Lambda",$sprite="SimpleQueueService,color=CC2264")
+
+    Container(sns, "SNS", "SNS", "SNS topic to send emails to pet owners when their pet is found",$sprite="SimpleNotificationService,color=CC2264")
+    
+    Container(cdn, "AWS Cloud Front", "Cloud front web distribution", "Serves web site and static content",$sprite="CloudFront,color=693CC5")
+
+    
+
+    Container(lambda, "AWS Lambda", "Java or C# Lambda functions", "Manages user's interaction with Pet Finder service. ", $sprite="Lambda,color=D86613")
+    
+    Container(s3, "AWS S3", "AWS S3", "Stores pet photos and spotters photo proofs ",$sprite="SimpleStorageService,color=green")
+    
+    ContainerDb(dynamodb, "AWS DynamoDb", "DynamoDB", "Stores missing pet entries, user comments, user pet found messages.",$sprite="DynamoDB,color=3B48CC")
+}
+
+System_Ext(googlemaps, "Google Maps", "Shows  the missing pets around the user location.")
+
+
+
+
+Rel(owner, web_app, "Uses", "HTTPS")
+Rel(spotter, web_app, "Uses", "HTTPS")
+
+Rel(web_app, cognito, "Creates user accounts and verifies credentials on", "HTTPS")
+Rel(web_app, api, "Uses","HTTPS")
+Rel_U(web_app, googlemaps, "Uses", "HTTPS")
+Rel_L(web_app, cdn, "Published on", "HTTPS")
+Rel(web_app, s3, "Upload photo proof photos to", "HTTPS")
+
+Rel(cdn, s3, "Reads static content images from", "")
+
+Rel(api, lambda, "Uses")
+
+Rel(api, dynamodb, "Writes to and reads from")
+
+Rel(api, cognito, "Authorises requests via")
+
+Rel(lambda, s3, "Writes images to")
+
+Rel_L(lambda, cognito, "Reads user profile/email from", "AWS-SDK")
+
+Rel(lambda, dynamodb, "Writes to and reads from", "AWS-SDK")
+
+Rel(api, sqs, "Sends request to", "")
+
+Rel_L(sqs, lambda, "sends messages to", "")
+
+Rel(dynamodb, lambda, "Triggers lambda for pet owner email notification", "Dynamo Db Streams")
+
+Rel(lambda, sns, "Sends an email to owner that someone has found their pet", "Dynamo Db Streams")
+
+Rel_U(sns, owner, "sends email messages to", "HTTPS")
+
+
+@enduml
