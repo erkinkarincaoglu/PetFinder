@@ -6,5 +6,5 @@ Spotter --> (See the comments)
 PetOwner --> (See the comments)
 PetOwner --> (Create a new \nmissing pet entry)
 PetOwner -> (Mark pet as "FOUND")
-PetOwner <-- (Receive  notification with \nphoto when pet is found)
+PetOwner <-- (Receive a notification with \n a photo when the pet is found)
 @enduml
