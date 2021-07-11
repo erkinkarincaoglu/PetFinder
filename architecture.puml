@@ -90,7 +90,7 @@ Rel(lambda, dynamodb, "Writes to and reads from", "AWS-SDK")
 
 Rel(api, sqs, "Sends request to", "")
 
-Rel_L(sqs, lambda, "sends messages to", "")
+Rel_L(sqs, lambda, "Read messages from", "")
 
 Rel(dynamodb, lambda, "Triggers a function when a pet marked as 'FOUND'", "Dynamo Db Streams")
 
