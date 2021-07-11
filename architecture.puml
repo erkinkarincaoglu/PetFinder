@@ -51,12 +51,12 @@ System_Boundary(c1, "Pet Finder Service"){
 
     Container(sns, "SNS", "SNS", "A Topic sends emails to pet owners when their pet is found",$sprite="SimpleNotificationService,color=CC2264")
     
-    Container(cdn, "AWS Cloud Front", "Cloud front web distribution", "Serves web site and static content",$sprite="CloudFront,color=693CC5")
+    Container(cdn, "AWS Cloud Front", "Cloud front web distribution", "Serves the web site",$sprite="CloudFront,color=693CC5")
 
 
     Container(lambda, "AWS Lambda", "Java or C# Lambda functions", "Manages user's interaction with Pet Finder service. ", $sprite="Lambda,color=D86613")
     
-    Container(s3, "AWS S3", "AWS S3", "Stores pet photos and spotters photo proofs ",$sprite="SimpleStorageService,color=green")
+    Container(s3, "AWS S3", "AWS S3", "Stores photo proofs ",$sprite="SimpleStorageService,color=green")
     
     ContainerDb(dynamodb, "AWS DynamoDb", "DynamoDB", "Stores missing pet entries, user comments and claims.",$sprite="DynamoDB,color=3B48CC")
 }
@@ -69,7 +69,7 @@ System_Ext(googlemaps, "Google Maps", "Shows  the missing pets around the user l
 Rel(owner, web_app, "Uses", "HTTPS")
 Rel(spotter, web_app, "Uses", "HTTPS")
 
-Rel(web_app, cognito, "Creates user accounts and verifies credentials on", "HTTPS")
+Rel(web_app, cognito, "Sign-up, sign-in users via", "HTTPS")
 Rel(web_app, api, "Uses","HTTPS")
 Rel_U(web_app, googlemaps, "Uses", "HTTPS")
 Rel_L(web_app, cdn, "Published on", "HTTPS")
@@ -92,7 +92,7 @@ Rel(api, sqs, "Sends request to", "")
 
 Rel_L(sqs, lambda, "sends messages to", "")
 
-Rel(dynamodb, lambda, "Triggers a function when pet is found", "Dynamo Db Streams")
+Rel(dynamodb, lambda, "Triggers a function when a pet marked as 'FOUND'", "Dynamo Db Streams")
 
 Rel(lambda, sns, "Sends emails by", "Dynamo Db Streams")
 
