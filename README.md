@@ -1,2 +1,2 @@
 # PetFinder
-Pet finder challange
+Pet finder challange resources
