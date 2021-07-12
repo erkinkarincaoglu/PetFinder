@@ -67,7 +67,7 @@ info:
     ```
 
 
-  version: 1.1.0
+  version: 1.0.0
   title: Pet Finder APIs
 tags:
   - name: Entries
@@ -381,6 +381,7 @@ components:
           description: Status of the missing entry 
           type: string
           enum: [MISSING, FOUND]
+          readOnly: true
     
     PatchRequest:
       type: object
