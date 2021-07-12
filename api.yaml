@@ -1,7 +1,11 @@
 openapi: 3.0.0
 info:
-  description: >
-    Pet Finder APIs
+  description: |
+    # Version
+    The version of the API you are using defined in the media type. The example below shows that the client is requesting the API version 1.1
+    ```
+    Content-Type: application/vnd.pet-finder-apis-v1.1+json
+    ```
   version: 1.0.0
   title: Pet Finder APIs
 tags:
@@ -16,24 +20,11 @@ paths:
     get:
       tags:
         - Entries
-      summary: Searches  pet missing entries by nearby location. Returns all the entries nearby. Assumed there won't be more than 1000 active missing pets at any given time around 6km range .
+      summary: Searches  pet missing entries by nearby location. Assumed there won't be more than 1000 active missing pets at any given time around ~7km range. So API does not support paging for simplicity and returns all records.
       operationId: getMissingPetEntriesByLocation
       parameters:
-        - name: X-PF-CorrelationId
-          in: header
-          description: >-
-            This header contains the ID by which we should be able to map entire journey of request
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: location
-          in: query
-          description: >-
-            location
-          required: true
-          schema:
-            type: string            
+        - $ref : '#/components/parameters/correlationId'
+        - $ref : '#/components/parameters/locationIdQueryParam'
       responses:
         '200':
           description: A list of missing pets
@@ -42,44 +33,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/MissingPetEntryList'
         '400':
-          description: 'Missing parameters, Invalid value for parameters'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'                
+          $ref: '#/components/responses/InvalidRequest'          
         '401':
-          description: 'Unauthorized'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Unauthorised'      
         '403':
-          description: 'Forbidden'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-                
+          $ref: '#/components/responses/Forbidden'      
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'     
+          $ref: '#/components/responses/InternalServerError'         
     post:
       tags:
         - Entries
-      summary: Creates  a  new missing pet entry.
+      summary: Creates a new missing pet entry.
       operationId: createMissingPetEntry
       parameters:
-        - name: X-PF-CorrelationId
-          in: header
-          description: >-
-            This header contains the ID by which we should be able to map entire journey of request
-          required: true
-          schema:
-            type: string
-            format: uuid
+        - $ref : '#/components/parameters/correlationId'
       requestBody:
         content:
           application/json:
@@ -88,33 +55,16 @@ paths:
         description: Missing pet details
         required: true            
       responses:
-        '201':
+        '204':
           description: Pet missing entry has been created.
         '400':
-          description: 'Missing parameters, Invalid value for parameters'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'                
+          $ref: '#/components/responses/InvalidRequest'          
         '401':
-          description: 'Unauthorized'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Unauthorised'      
         '403':
-          description: 'Forbidden'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-                
+          $ref: '#/components/responses/Forbidden'      
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'    
+          $ref: '#/components/responses/InternalServerError'        
     
   /entries/{entryId}:
     get:
@@ -123,21 +73,8 @@ paths:
       summary: Retrieve a missing pet entry
       operationId: getMissingPetEntry
       parameters:
-        - name: X-PF-CorrelationId
-          in: header
-          description: >-
-            This header contains the ID by which we should be able to map entire journey of request
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: entryId
-          in: path
-          description: >-
-            EntryId
-          required: true
-          schema:
-            type: string            
+        - $ref : '#/components/parameters/correlationId'
+        - $ref : '#/components/parameters/entryIdPathParam'
       responses:
         '200':
           description: A missing pet entry
@@ -146,108 +83,48 @@ paths:
               schema:
                 $ref: '#/components/schemas/MissingPetEntry'
         '400':
-          description: 'Missing parameters, Invalid value for parameters'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'                
+          $ref: '#/components/responses/InvalidRequest'          
         '401':
-          description: 'Unauthorized'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Unauthorised'      
         '403':
-          description: 'Forbidden'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-                
+          $ref: '#/components/responses/Forbidden'      
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'      
-    put:
+          $ref: '#/components/responses/InternalServerError'        
+    patch:
       tags:
         - Entries
-      summary: Update the missing pet entry. If the username in the authorisation header does not match the entry's owner the request is rejected. Entry status can be updated to "FOUND" by the owner of the pet once their pet is found through this API.
+      summary: Update the missing pet entry status. If the username in the authorisation header does not match the entry's owner the request is rejected. Entry status can be updated to "FOUND" by the owner once their pet is found. Only status of on pet entry can be updated for simplicity.
       operationId: updateMissingPetEntry
       parameters:
-        - name: X-PF-CorrelationId
-          in: header
-          description: >-
-            This header contains the ID by which we should be able to map entire journey of request
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: entryId
-          in: path
-          description: >-
-            EntryId
-          required: true
-          schema:
-            type: string            
+        - $ref : '#/components/parameters/correlationId'
+        - $ref : '#/components/parameters/entryIdPathParam'         
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MissingPetEntry'
+              $ref: '#/components/schemas/PatchRequest'
         description: Updates a missing pet entry.
         required: true            
       responses:
         '204':
           description: Pet missing entry has been updated.
         '400':
-          description: 'Missing parameters, Invalid value for parameters'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'                
+          $ref: '#/components/responses/InvalidRequest'          
         '401':
-          description: 'Unauthorized'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Unauthorised'      
         '403':
-          description: 'Forbidden'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-                
+          $ref: '#/components/responses/Forbidden'      
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'                
+          $ref: '#/components/responses/InternalServerError'                     
   /entries/{entryId}/comments:
     get:
       tags:
         - Comments
-      summary:  Retrieves all the comments for the given entry ordered by create date. We will assume we won't have more than 1000 comments for a given entry. If required paging can be added later.
+      summary:  Retrieves all the comments for the given entry ordered by create date. Assumed that there won't be more than 1000 comments for a given entry. So paging is not supported for simplicity. If required it can be added later.
       operationId: getCommentsInGivenEntry
       parameters:
-        - name: X-PF-CorrelationId
-          in: header
-          description: >-
-            This header contains the ID by which we should be able to map entire journey of request
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: entryId
-          in: path
-          description: >-
-            entryId
-          required: true
-          schema:
-            type: string    
+        - $ref : '#/components/parameters/correlationId'
+        - $ref : '#/components/parameters/entryIdPathParam' 
       responses:
         '200':
           description: A list of comments associated with an entry
@@ -256,44 +133,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/CommentList'
         '400':
-          description: 'Missing parameters, Invalid value for parameters'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'                
+          $ref: '#/components/responses/InvalidRequest'          
         '401':
-          description: 'Unauthorized'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Unauthorised'      
         '403':
-          description: 'Forbidden'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'            
+          $ref: '#/components/responses/Forbidden'      
+        '500':
+          $ref: '#/components/responses/InternalServerError'               
     post:
       tags:
         - Comments
       summary: Post a new comment on an entry. For simplicity we won't allow updates on comments.
       operationId: createComment
       parameters:
-        - name: X-PF-CorrelationId
-          in: header
-          description: >-
-            This header contains the ID by which we should be able to map entire journey of request
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: entryId
-          in: path
-          description: >-
-            entryId
-          required: true
-          schema:
-            type: string               
+        - $ref : '#/components/parameters/correlationId'    
+        - $ref : '#/components/parameters/entryIdPathParam' 
       requestBody:
         content:
           application/json:
@@ -301,56 +155,26 @@ paths:
               $ref: '#/components/schemas/Comment'
         required: true            
       responses:
-        '201':
+        '204':
           description: Comment has been created.
         '400':
-          description: 'Missing parameters, Invalid value for parameters'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'                
+          $ref: '#/components/responses/InvalidRequest'          
         '401':
-          description: 'Unauthorized'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Unauthorised'      
         '403':
-          description: 'Forbidden'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-                
+          $ref: '#/components/responses/Forbidden'      
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'    
+          $ref: '#/components/responses/InternalServerError'       
 
   /entries/{entryId}/claims:
     post:
       tags:
         - Claims
       summary: Post a new "Pet Found" message to the owner with a photo proof
-      operationId: createPetFound
+      operationId: createPetFoundMessage
       parameters:
-        - name: X-PF-CorrelationId
-          in: header
-          description: >-
-            This header contains the ID by which we should be able to map entire journey of request
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: entryId
-          in: path
-          description: >-
-            entryId
-          required: true
-          schema:
-            type: string               
+        - $ref : '#/components/parameters/correlationId'    
+        - $ref : '#/components/parameters/entryIdPathParam'              
       requestBody:
         content:
           application/json:
@@ -358,34 +182,48 @@ paths:
               $ref: '#/components/schemas/PetFound'
         required: true            
       responses:
-        '201':
-          description: Message has been posted to the pet owner.
+        '204':
+          description: Message has been posted to the pet owner by email.
         '400':
-          description: 'Missing parameters, Invalid value for parameters'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'                
+          $ref: '#/components/responses/InvalidRequest'          
         '401':
-          description: 'Unauthorized'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Unauthorised'      
         '403':
-          description: 'Forbidden'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-                
+          $ref: '#/components/responses/Forbidden'      
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'    
+          $ref: '#/components/responses/InternalServerError'  
+  
+
+    
 components:
+  parameters:
+    correlationId:
+      name: x-pf-correlationId
+      in: header
+      required: true
+      description: A unique co-relation id for a request to link request/response
+      schema:
+        type: string
+        format: uuid
+    entryIdPathParam:
+      name: entryId
+      in: path
+      required: true
+      description: Missing pet entry id
+      schema:
+        type: string
+        example: QlD645qe
+        maxLength: 8
+    locationIdQueryParam:
+      name: location
+      in: query
+      required: true
+      description: Location of the spotter in plus codes
+      schema:
+        maxLength: 16
+        type: string
+        example: 9C3XFP73+24
+
   schemas:
     MissingPetEntryList:
       type: object
@@ -403,19 +241,21 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Comment'            
+    
     PetFound:
-      description: Pet found message sent to the ownner
+      description: Pet found message sent to the ownner via email
       type: object
       required:
         - message
       properties:
         message:
-          description: Message to the owner. e.g. "Hi ! I found your cat. It is with me and safe."
+          description: Message to the owner. 
           type: string
           example: "Hi ! I found your cat. It is with me and safe."
+          maxLength: 500
 
     Comment:
-      description: A comment in an entry
+      description: A comment in on a pet missing entry
       type: object
       required:
         - message
@@ -425,14 +265,17 @@ components:
           description: Comment
           type: string
           example: "I think I saw your cat near Richmond park Sheen gate!"
+          maxLength: 500
         entryId:
           description: Entry id for the comment.
           type: string
-          example: "QlD645qe"          
+          example: "QlD645qe"
+          maxLength: 8
         location:
           description: Optional location code posted by the commentator
           type: string  
           example: 9C3XFP73+24
+          maxLength: 16
       
             
     MissingPetEntry:
@@ -443,58 +286,117 @@ components:
         - location
         - message
         - reward
+        - currency
       properties:
         petname:
           description: Name of the pet
           type: string
           example: "Dumpling"
+          maxLength: 100
         location:
           description: Location plus code
           type: string  
           example: 9C3XFP73+24
+          maxLength: 16
         message:
           description: Pet missing message entry detailed message
           type: string  
           example: "Help me please ! My cat is missing"
+          maxLength: 500
         reward:
           description: Reward in minor currency units
           type: number
           example: 100
+          minimum: 0
+          maximum: 9999999
         currency:
-          description: reward curreny code in ISO 4217
+          description: 3 letter ISO 4217 currency code.
           type: string
           example: GBP
+          minLength: 3
+          maxLength: 3
         status:
           description: Status of the missing entry 
           type: string
           enum: [MISSING, FOUND]
+    
+    PatchRequest:
+      type: object
+      description: |
+        Object patch operation based on rfc6902: https://datatracker.ietf.org/doc/html/rfc6902
+      properties:
+        operation: 
+          type: string
+          enum: [REPLACE, ADD, DELETE]        
+        key:
+          description: field name
+          type: string
+        value:
+          description: field value
+          type: string
+          
+        
+    Errors:
+      type: object
+      allOf:
+        - $ref : '#/components/schemas/Error'
+      properties:
+        validationErrors:
+          type: array
+          description: A list of validation errors
+          items:
+            $ref: '#/components/schemas/ValidationError'
           
     Error:
       type: object
       required:
-        - httpStatusCode
-        - customCode
+        - errorName
         - message
       properties:
-        httpStatusCode:
-          type: integer
-          minimum: 100
-          maximum: 599
-          description: HTTP Status code for error
-        customCode:
+        errorName:
           type: string
-          description: Application specific error code
+          description: A machine and human readable error type for clarity and semantic understanding of the error
         message:
           type: string
-          description: Short message describing cause of error
-        description:
+          description: A human readable message giving a corrective action for the error. This is not for the machine consumption.
+          
+    ValidationError:
+      type: object
+      allOf:
+        - $ref : '#/components/schemas/Error'
+      properties:
+        jsonPath:
           type: string
-          description: Details error description
-        errorHelpUrl:
+          description: The field represents JSONPAth of the element within the request body associated with the error
+        pathParameter:
           type: string
-          description: >-
-            URL to page containing rich error description and resolution
-            examples
-        moreInfo:
+          description: This field identifies a path paremeter within the request URL that cause an error e.g. a resource reference.
+        queryParameter:
           type: string
-          description: More details describing error
+          description: This field represents the name of a query parameter within the request URL that caused the error. 
+  responses:
+    InvalidRequest: 
+      description: Invalid Request
+      content:
+        'application/json':
+          schema:
+            $ref : '#/components/schemas/Errors'
+    Unauthorised: 
+      description: Unauthorised
+      content:
+        'application/json':
+          schema:
+            $ref : '#/components/schemas/Errors'
+    Forbidden: 
+      description: Forbidden
+      content:
+        'application/json':
+          schema:
+            $ref : '#/components/schemas/Errors'
+    InternalServerError: 
+      description: InternalServerError
+      content:
+        'application/json':
+          schema:
+            $ref : '#/components/schemas/Errors'
+      
