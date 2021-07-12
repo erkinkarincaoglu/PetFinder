@@ -1,12 +1,73 @@
 openapi: 3.0.0
 info:
   description: |
+
+    # Security 
+    Pet finder APIs use JWT Based Bearer Authentication. JWT Token must contain claims for the Cognito user
+    # Response Codes 
+    
+    A list of the  common HTTP response codes used in the  API is given below:
+    
+      |HTTP Code|HTTP Verb|Description|
+      |--- |--- |--- |
+      |200|GET POST PUT|The request has succeeded.|
+      |201|POST|The request has succeeded and a new resource has been created as a result.|
+      |204|PUT DELETE|The request has succeeded, an existing resource has been updated/deleted and the response body is empty.|
+      |400|POST PUT|The service could not understand the request.|
+      |401|Any|The client must authenticate itself.|
+      |404|GET PUT DELETE|The service can not find requested resource.|
+      |415|Any|Content-Type and/or Accept headers are missing or invalid|
+      |422|Any|The request was well-formed but could not be processed due to semantic errors.|
+      |500|Any|An error occurred within the service which hasn’t been accounted for.|
+      |503|Any|The service is not ready to handle the request.|
+
+    # Errors  
+    
+    The response contains an errorName that is both human-readable and machine-readable, with a human-readable message to add context to help you diagnose the error.
+
+    If there are multiple errors, the response includes all the errors in a nested list within the top-level error.
+
+    ### Generic Error Format  
+    ```
+    {
+      "errorName": "errorName",
+      "message": "human readable message"
+    }
+    ```
+    
+    ### Specific Error Format  
+     
+    Validation errors must also contain a path to the location of the value that caused the error. The field to use here depends on whether the error ocurred on the URL or in the JSON request body:
+     
+    ```
+    {
+      "errorName": "bodyDoesNotMatchSchema",
+      "message": "The json body provided does not match the expected schema",
+      "validationErrors": [
+          {
+            "errorName": "fieldMustBeNumber",
+            "message": "Field at path must be a number",
+            "jsonPath": "$.amount"
+          }
+        ]
+      }
+    ```        
+    
+    # Media Type
+       The Media Type specifies the nature and format of the JSON file and it is defined in  **Content-Type** header. 
+       
+      The **Content-Type** header is required if the request you’re sending includes a request body and if the HTTP method is a POST,PUT or PATCH.
+      ```
+      Content-Type: application/vnd.pet-finder-apis-v1.1+json
+      ```
     # Version
     The version of the API you are using defined in the media type. The example below shows that the client is requesting the API version 1.1
     ```
     Content-Type: application/vnd.pet-finder-apis-v1.1+json
     ```
-  version: 1.0.0
+
+
+  version: 1.1.0
   title: Pet Finder APIs
 tags:
   - name: Entries
