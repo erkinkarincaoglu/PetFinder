@@ -328,12 +328,15 @@ components:
         operation: 
           type: string
           enum: [REPLACE, ADD, DELETE]        
+          example: "REPLACE"
         key:
           description: field name
           type: string
+          example: "STATUS"
         value:
           description: field value
           type: string
+          example: "FOUND"
           
         
     Errors:
