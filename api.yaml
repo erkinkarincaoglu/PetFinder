@@ -103,7 +103,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PatchRequest'
-        description: Updates a missing pet entry.
+        description: |
+            Updates a missing pet entry by a patch request based on  rfc6902 https://datatracker.ietf.org/doc/html/rfc6902
         required: true            
       responses:
         '204':
@@ -402,7 +403,3 @@ components:
         'application/json':
           schema:
             $ref : '#/components/schemas/Errors'
-            
-            
-            
-      
